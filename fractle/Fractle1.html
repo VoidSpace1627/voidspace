@@ -1,0 +1,176 @@
+<!DOCTYPE htm>
+<html>
+
+<head>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        canvas {
+            background: black;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%)
+        }
+
+        #controls {
+            position: absolute;
+            padding: 10px;
+            border: 2px solid white;
+            left: 20px;
+            top: 20px;
+            width: 250px;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        button {
+            padding: 10px 40px;
+            width: 225px;
+            font-size: 20px;
+        }
+
+        label,
+        input {
+            color: white;
+            font-size: 20px;
+        }
+    </style>
+    <title> Art </title>
+</head>
+<canvas></canvas>
+
+<body>
+    <div id="controls">
+        <button id="randomize"> Randomize!!! </button>
+        <div>
+            <input id="spread" type="range" min="0.1" max="3.1" step="0.02" value="1">
+            <label for="spread"> Spread: </label>
+            <input id="" type="range" min="2" max="15" step="1" value="3">
+            <label for="sides"> Sides: </label>
+        </div>
+    </div>
+</body>
+
+</html>
+
+
+<script>
+    addEventListener('load', function () {
+        const canvas = document.querySelector('canvas');
+        const c = canvas.getContext('2d')
+        canvas.width = innerWidth;
+        canvas.height = innerHeight;
+
+        c.lineCap = 'round';
+        c.shadowColor = 'black' //'hsl(' + Math.floor(Math.random() * 359 + 1) + ', 100%, 50%)'
+        c.shadowOffsetX = 10
+        c.shadowOffsetY = 5
+        c.shadowBlur = 5
+
+        let size = canvas.width < canvas.height ? canvas.width * 0.3 : canvas.height * 0.3
+        const maxLevel = 2 // determins max depth of fractle
+        const branches = 3
+
+        let rpres = false
+
+        let sides = 5 // diff number of branches
+        let scale = 0.5 // how much smaller the segments are comapred to parent b ranch
+        let spread = 0.8 // angle between parent branch and segments
+        let color = 'hsl(' + Math.floor(Math.random() * 359 + 1) + ', 100%, 50%)'
+        let lineWidth = Math.floor(Math.random() * 9 + 3)
+
+        const randomize = document.getElementById('randomize')
+        const slider_spread = document.getElementById('spread')
+        const lable_spread = document.querySelector('[for="spread"]')
+        slider_spread.addEventListener('change', function(e){
+            spread = e.target.value
+            drawFractle()
+        })
+
+        const slider_sides = document.getElementById('sides')
+        const lable_sides = document.querySelector('[for="sides"]')
+        slider_sides.addEventListener('change', function(e){
+            //branches = e.target.value
+            //drawFractle()
+            console.log(e)
+        })
+
+        function updateSliders() {
+            slider_spread.value = spread
+            lable_spread.innerText = ' Spread: ' + Number(spread).toFixed(1)
+            slides_sides.value = sides
+            lable_slides.innerText = ' Sides: ' + sides
+        }
+
+        function drawBranch(level) {
+            if (level > maxLevel) return;
+            c.beginPath();
+            c.moveTo(0, 0);
+            c.lineTo(size, 0);
+            c.stroke();
+            for (let i = 0; i < branches; i++) {
+                c.save()
+                c.translate(size - (size / branches) * i, 0)
+                c.scale(scale, scale)
+
+                c.save()
+                c.rotate(spread);
+                drawBranch(level + 1)
+                c.restore()
+
+                c.save()
+                c.rotate(-spread)
+                drawBranch(level + 1)
+                c.restore()
+
+                c.restore()
+            }
+
+        }
+
+        function drawFractle() {
+            c.clearRect(0, 0, canvas.width, canvas.height)
+            c.save()
+            c.lineWidth = lineWidth;
+            c.strokeStyle = color;
+            c.translate(canvas.width / 2, canvas.height / 2)
+            for (i = 0; i < sides; i++) {
+                c.rotate((Math.PI * 2) / sides)
+                drawBranch(0)
+            }
+            c.restore()
+        }
+        drawFractle()
+
+        function randomizeFractle() {
+            sides = Math.floor(Math.random() * 7 + 2) // diff number of branches
+            scale = Math.random() * 0.2 + 0.4 // how much smaller the segments are comapred to parent b ranch
+            spread = Math.random() * 2.9 + 0.1 // angle between parent branch and segments
+            color = 'hsl(' + Math.floor(Math.random() * 359 + 1) + ', 100%, 50%)'
+            lineWidth = Math.floor(Math.random() * 6 + 3)
+            c.shadowColor = 'black' //'hsl(' + Math.floor(Math.random() * 359 + 1) + ', 100%, 50%)'
+            drawFractle()
+
+        }
+
+        randomize.addEventListener('click', function () {
+            randomizeFractle()
+            drawFractle()
+        })
+
+
+        addEventListener('keypress', keypress)
+
+        function keypress(e) {
+            if (e.key === "r") {
+                rpres = true
+                randomizeFractle()
+                Spread()
+            }
+        }
+    })
+</script>

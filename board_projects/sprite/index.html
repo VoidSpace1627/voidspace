@@ -1,0 +1,214 @@
+<style>
+    img {
+        display: none;
+    }
+</style>
+
+<img src="pokemon.png" id="spriteSheet">
+
+<canvas width="10000" height="10000"></canvas>
+
+<script>
+    const canvas = document.querySelector('canvas');
+    const c = canvas.getContext('2d');
+
+    canvas.width = innerWidth
+    canvas.height = innerHeight
+
+    var direction = {
+        walkLeftx: [80, 148, 148, 80],
+        walkLefty: [120, 120, 120, 120],
+        walkRightx: [80, 150, 150, 80],
+        walkRighty: [220, 220, 220, 220],
+        walkUpx: [80, 150, 150, 80],
+        walkUpy: [315, 315, 315, 315],
+        walkDownx: [80, 150, 150, 80],
+        walkDowny: [30, 30, 30, 30],
+    }
+
+    var direction2 = {
+        walkLeftx: [75, 140, 140, 75],
+        walkLefty: [490, 490, 490, 490],
+        walkRightx: [75, 140, 140, 75],
+        walkRighty: [590, 590, 590, 590],
+        walkUpx: [80, 150, 150, 80],
+        walkUpy: [670, 670, 670, 670],
+    }
+
+    var sx = direction.walkLeftx
+    var sy = direction.walkLefty
+
+    var x = 100
+    var y = 100
+
+    var width = 100
+    var height = 100
+
+    var wpres = false
+    var apres = false
+    var spres = false
+    var dpres = false
+    var epres = false
+
+    var spriteIndex = 0
+
+    var player = 0
+
+    var pointerX = -1
+    var pointerY = -1
+
+    addEventListener('keydown', keydown, false)
+    addEventListener('keyup', keyup, false)
+
+    window.onload = function () {
+        img = document.getElementById("spriteSheet");
+        //image, sx, sy, sw, sh, dx, dy, dw, dh
+    }
+
+    function select() {
+        if (player >= 3) {
+            player = 0
+        }
+        if (epres === true) {
+            player++
+        }
+        if (player === 1) {
+            p1 = setInterval(player1, 100)
+
+        }
+        if (player === 2) {
+            p2 = setInterval(player2, 100)
+        }
+
+        console.log(player)
+
+    }
+
+    function player2() {
+        c.clearRect(0, 0, canvas.width, canvas.height)
+        c.drawImage(img, sx[spriteIndex], sy[spriteIndex], 80, 80, x, y, width, height)
+        spriteIndex++
+        sx = direction2.walkUpx
+        sy = direction2.walkUpy
+        if (spriteIndex === 4) {
+            spriteIndex = 0
+        }
+        if (player === 1) {
+            stop()
+            c.clearRect(x, y, width, height)
+        }
+
+        if (player === 3) {
+            stop()
+            c.clearRect(x, y, width, height)
+        }
+
+    }
+
+    function player1() {
+        c.clearRect(0, 0, canvas.width, canvas.height)
+        c.drawImage(img, sx[spriteIndex], sy[spriteIndex], 80, 80, x, y, width, height)
+        spriteIndex++
+        sx = direction.walkUpx
+        sy = direction.walkUpy
+        if (spriteIndex === 4) {
+            spriteIndex = 0
+        }
+        if (player === 2) {
+            stop()
+            c.clearRect(x, y, width, height)
+        }
+
+    }
+
+    function stop() {
+        if (player > 1) {
+            clearInterval(p1)
+        }
+        if (player > 2) {
+            clearInterval(p2)
+        }
+    }
+
+    function keydown(e) {
+        if (player === 1) {
+            if (e.key === 'w') {
+                wpres = true
+                y = y - 5
+                sx = direction.walkUpx
+                sy = direction.walkUpy
+            }
+            if (e.key === 'a') {
+                apres = true
+                x = x - 5
+                sx = direction.walkLeftx
+                sy = direction.walkLefty
+
+            }
+            if (e.key === 's') {
+                spres = true
+                y = y + 5
+                sx = direction.walkDownx
+                sy = direction.walkDowny
+            }
+            if (e.key === 'd') {
+                dpres = true
+                x = x + 5
+                sx = direction.walkRightx
+                sy = direction.walkRighty
+            }
+        }
+        if (player === 2) {
+            if (e.key === 'w') {
+                wpres = true
+                y = y - 5
+                sx = direction2.walkUpx
+                sy = direction2.walkUpy
+            }
+            if (e.key === 'a') {
+                apres = true
+                x = x - 5
+                sx = direction2.walkLeftx
+                sy = direction2.walkLefty
+            }
+            if (e.key === 's') {
+                spres = true
+                y = y + 5
+                sx = direction2.walkDownx
+                sy = direction2.walkDowny
+            }
+            if (e.key === 'd') {
+                dpres = true
+                x = x + 5
+                sx = direction2.walkRightx
+                sy = direction2.walkRighty
+            }
+        }
+        if (e.key === 'e') {
+            epres = true
+            select()
+        }
+    }
+
+    function keyup(e) {
+        if (e.key === 'w') {
+            wpres = false
+        }
+        if (e.key === 'a') {
+            apres = false
+        }
+        if (e.key === 's') {
+            spres = false
+        }
+        if (e.key === 'd') {
+            dpres = false
+        }
+        if (e.key === 'q') {
+            qpres = false
+        }
+        if (e.key === 'e') {
+            epres = false
+        }
+    }
+
+</script>

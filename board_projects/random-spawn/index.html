@@ -1,0 +1,40 @@
+<canvas></canvas>
+<script>
+    const canvas = document.querySelector('canvas');
+    const c = canvas.getContext('2d');
+
+    canvas.width = innerWidth;
+    canvas.height = innerHeight;
+
+    var speedX = 10
+    var speedY = 10
+
+    var x = canvas.width / 2 //Math.floor(Math.random() * 8000 + 1878)
+    var y = 950 //Math.floor(Math.random() * 8000 + 948)
+
+
+
+    setInterval(square, 50)
+
+    function square() {
+
+        if (x > canvas.width) {
+            if (x > 0) {
+                if (y > canvas.height) {
+                    if (y > 0) {
+                    c.clearRect(0, 0, 100000, 10000)
+                    c.fillStyle = 'red'
+                    c.fillRect(x, y, 50, 50)
+                    //x = x + speedX
+                    y = y + speedY
+                    console.log(x)
+                    console.log(y)
+                    }
+                }
+            }
+        }
+
+    }
+
+
+</script>

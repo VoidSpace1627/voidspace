@@ -1,0 +1,100 @@
+<style>
+    body {
+      margin: 0;
+    }
+  
+    div {
+      margin: 0;
+      padding: 0;
+    }
+  
+    button {
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+  <div>
+    <button onClick="Gardner()">Gardener</button>
+  
+    <button onClick="Widower()">Widower</button>
+  </div>
+  <canvas></canvas>
+  <script>
+    const canvas = document.querySelector("canvas");
+    const c = canvas.getContext("2d");
+  
+    setInterval(flower, 50);
+    canvas.width = innerWidth;
+    canvas.height = innerHeight;
+  
+  var NumberOfFlowers = 50
+    var gardenerRunning = false;
+    var widowerRunning = false;
+    var x = [];
+    var y = [];
+    var living = [];
+    var flowerIndex = 0
+    var color = ["red", "blue", "green"];
+  
+    setInterval(flower,50)
+  
+    function Gardner() {
+      gardenerRunning = true;
+      
+    }
+  
+    function Widower() {
+      if (gardenerRunning) {
+      } else {
+        widowerRunning = true;
+      }
+    }
+  
+    function flower() {
+      c.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < NumberOfFlowers; i++) {
+        c.fillStyle = color[i];
+        c.fillRect(x[i], y[i], 50, 50);
+      }
+      c.font = "30px Arial";
+      c.fillStyle = "black";
+      c.fillText("Welcome To The Flower Game", 0, 25);
+  
+      c.font = "20px Arial";
+  
+      c.fillText(
+        "Green Squares are normal live Flowers, Red & Blue are Mutations, The Game Starts With The Gardener Sowing new life (flowers) and The Widower Taking Life at the end till there is only one left the absolute final form",
+        0,
+        49
+      );
+    if (gardenerRunning) {
+        x[flowerIndex] = Math.floor(Math.random() * canvas.width);
+        y[flowerIndex] = Math.floor(Math.random() * canvas.height);
+        if (x[flowerIndex] > canvas.width - 50) {
+          x[flowerIndex] = canvas.width - 50;
+        }
+        if (x[flowerIndex] < 0) {
+          x[flowerIndex] = 0;
+        }
+        if (y[flowerIndex] > canvas.height - 50) {
+          y[flowerIndex] = canvas.height - 50;
+        }
+        if (y[flowerIndex] < 50) {
+          y[flowerIndex] = 50;
+        }
+  
+        flowerIndex++
+  
+        if(flowerIndex >= NumberOfFlowers){
+            gardenerRunning = false
+            flowerIndex = 0
+        }
+  
+  
+      
+    }
+    }
+  
+    function death() {}
+  </script>
+  

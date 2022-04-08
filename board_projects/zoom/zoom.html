@@ -1,0 +1,41 @@
+<style>
+    body {
+        background: black;
+        margin: 0;
+    }
+</style>
+<canvas></canvas>
+<script>
+    const canvas = document.querySelector("canvas");
+    const c = canvas.getContext("2d");
+
+    canvas.width = innerWidth;
+    canvas.height = innerHeight;
+
+    var x = 50
+    var y = 50
+    var width = 50
+    var height = 50
+    var centX = canvas.width / 2
+    var centY = canvas.height / 2
+
+    setInterval(firstBox, 100)
+
+    function firstBox() {
+        let x = centX
+        let y = centY
+        width--
+        height--
+        c.clearRect(0, 0, canvas.width, canvas.height)
+        c.fillStyle = 'red'
+        c.fillRect(x, y, width, height)
+
+    }
+    
+
+
+
+
+
+
+</script>

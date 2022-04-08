@@ -1,0 +1,85 @@
+<style>
+  body {
+    background: black;
+    margin: 0;
+  }
+</style>
+<canvas></canvas>
+<script>
+  const canvas = document.querySelector("canvas");
+  const c = canvas.getContext("2d");
+
+  canvas.width = innerWidth;
+  canvas.height = innerHeight;
+
+  addEventListener("mousemove", mouseTrack)
+
+  var x = []
+  var y = []
+  var centX = canvas.width / 2
+  var centY = canvas.height / 2
+  var posX = []
+  var posY = []
+  var numberOfLines = 10 //how many lines to display before yous start deleting them
+  var pointerx = 0
+  var pointery = 0
+
+    setInterval(draw, 150)
+  setInterval(clear, 150)
+    function draw() {
+      c.clearRect(0, 0, canvas.width, canvas.height)
+      x = Math.floor(Math.random() * canvas.width)
+      y = Math.floor(Math.random() * canvas.height)
+
+      posX[numberOfLines - 1] = x
+      posY[numberOfLines - 1] = y
+
+      for (i = 0; i < numberOfLines; i++) {
+
+        if (posX[i] === null) {
+          posX[i] = posX[numberOfLines - 1]
+        }
+        if (posY[i] === null) {
+          posY[i] = posY[numberOfLines - 1]
+        }
+
+        c.strokeStyle = "red"
+        c.strokeWeight = "3"
+        c.beginPath()
+        c.moveTo(centX, centY)
+        c.lineTo(posX[i], posY[i])
+        c.stroke()
+
+        if (i > 0) {
+          posX[i - 1] = posX[i]
+          posY[i - 1] = posY[i]
+        }
+      }
+
+    }
+
+    function clear() {
+      posX.push(x)
+      posY.push(y)
+      c.clearRect(centX, centY, posX, posY)
+    }
+
+  function mouseTrack(e) {
+    pointerx = e.layerX;
+    pointery = e.layerY;
+    if (pointerx < canvas.width) {
+      if (pointery < canvas.height) {
+        c.strokeStyle = "red"
+        c.strokeWeight = "3"
+        c.beginPath()
+        c.moveTo(centX, centY)
+        c.lineTo(pointerx, pointery)
+        c.stroke()
+        run()
+      }
+    }
+  }
+
+
+
+</script>

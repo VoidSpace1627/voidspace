@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            background: rgb(0, 0, 0);
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas></canvas>
+</body>
+
+</html>
+<script>
+    const canvas = document.querySelector('canvas');
+    const c = canvas.getContext('2d');
+
+    canvas.width = innerWidth
+    canvas.height = innerHeight
+
+    window.onload = function () {
+        for (i = 0; i < Math.random() * 250; i++) {
+            x.push(Math.floor(Math.random() * canvas.width))
+            y.push(Math.floor(Math.random() * 100 - 50))
+        }
+    }
+
+    var x = [];
+    var y = [];
+
+    var speedX = []
+    
+    var speedY = [0.1, 0.5, 1, 0.2]
+
+    setInterval(rain, 10)
+
+    function rain() {
+        c.fillStyle = 'rgba(0, 0, 0, 0.1)'
+        c.fillRect(0, 0, canvas.width, canvas.height)
+
+        for (i = 0; i < x.length; i++) {
+
+            c.fillStyle = 'blue'
+            c.fillRect(x[i], y[i], 3, 1)
+
+            c.beginPath();
+            c.fillStyle = 'blue'
+            c.arc(x[i] + 1, y[i] + 3, 2, 0, 1 * Math.PI);
+            c.fill()
+
+            //x[i]++
+            y[i] = y[i] + speedY[Math.floor(Math.random() * 5)]
+
+            if (y[i] > canvas.height) {
+                speedY =- 1
+            }
+           /* if (y[i] < canvas.height) {
+                speedY =+ 1
+            }*/
+          
+        }
+        
+    }
+
+</script>

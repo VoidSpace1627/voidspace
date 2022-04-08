@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-image: url('https://library.kissclipart.com/20180930/uoe/kissclipart-park-cartoon-clipart-urban-park-clip-art-d755b037b0e696f5.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            cursor: none;
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="fixed text-white text-sm ml-2 mt-1 select-none"><span>Score: </span><span id="scoreEl">0</span></div>
+    <div class="fixed inset-0 flex items-center justify-center" id="modalEl">
+        <div class=" max-w-md w-full p-6 text-center">
+            <h1 class="text-4xl font-bold leading-none text-white" id="bigScore">0</h1>
+            <p class="text-sm text-white mb-4 leading-none">Points</p>
+            <div>
+                <button class="bg-blue-500 text-white w-full py-3 rounded-full text-sm" id="startGameBtn">Start
+                    Game</button>
+
+            </div>
+        </div>
+    </div>
+    <canvas></canvas>
+
+</body>
+
+</html>
+
+<script>
+    // document.getElementById("myAudio")
+    const canvas = document.querySelector('canvas');
+    const c = canvas.getContext('2d');
+
+    const scoreEl = document.querySelector('#scoreEl')
+    const startGameBtn = document.querySelector('#startGameBtn')
+    const modalEl = document.querySelector('#modalEl')
+    const bigScore = document.querySelector('#bigScore')
+
+    canvas.width = innerWidth
+    canvas.height = innerHeight
+
+    addEventListener('mouseup', mouseUp)
+    addEventListener('mousedown', mouseDown)
+
+    document.onmousemove = function (event) {
+        pointerX = event.pageX;
+        pointerY = event.pageY;
+    }
+
+    var pointerX = 0
+    var pointerY = 0
+
+    var x = 20
+    var y = 20
+    var centX = canvas.width / 2
+    var centY = canvas.height / 2
+    var width = 20
+    var height = 20
+    var t = 800
+
+    var check = false
+
+    var startGame = false
+
+    var x1 = Math.floor(Math.random() * canvas.width - 50)
+    var y1 = Math.floor(Math.random() * canvas.height - 50)
+
+    var x2 = Math.floor(Math.random() * canvas.width - 50)
+    var y2 = Math.floor(Math.random() * canvas.height - 50)
+
+    var audio = new Audio('shot.mp3');
+
+    var screamM = new Audio('scream.mp3');
+
+    var screamF = new Audio('screamF.mp3');
+
+    var badguy = new Image()
+    badguy.src = "badGuy.png"
+
+    var hostage = new Image()
+    hostage.src = "hostage.png"
+    //hostage.src = "https://www.magneticmag.com/.image/t_share/MTQ5MTcxMTMyMzA4NjYxNzAx/flat800x800070fu3.jpg"
+
+
+    function init() {
+        score = 0
+        scoreEl.innerHTML = score
+        bigScore.innerHTML = score
+    }
+
+
+    retical = setInterval(retical, 10)
+
+    function retical() {
+
+        if (startGame === true) {
+            c.clearRect(0, 0, canvas.width, canvas.height)
+
+
+
+            c.beginPath();
+            c.drawImage(badguy, x1, y1, 150, 150)
+            c.fill();
+
+
+
+            c.beginPath();
+            c.drawImage(hostage, x2, y2, 100, 100)
+            c.fill();
+
+            c.beginPath()
+            c.strokeStyle = 'limegreen'
+            c.arc(pointerX, pointerY, width, height, 0, 2 * Math.PI)
+            c.stroke()
+            c.strokeStyle = "red"
+            c.strokeWeight = "3"
+            c.beginPath()
+            c.moveTo(pointerX - 50, pointerY)
+            c.lineTo(pointerX + 50, pointerY)
+            c.moveTo(pointerX, pointerY - 50)
+            c.lineTo(pointerX, pointerY + 50)
+            c.stroke()
+        }
+    }
+
+    function stop() {
+        clearInterval(retical)
+    }
+
+    function mouseDown() {
+        check = true
+        hit()
+    }
+
+    function mouseUp() {
+        check = false
+    }
+
+    let score = 0
+    function hit() {
+
+        //c.fillStyle = 'red'
+        //c.fillRect(x1  , y1  , 100, 100)
+        //c.fillStyle = 'white'
+        //c.fillRect(pointerX, pointerY, 20, 20)
+
+        if (pointerX <= x2 + 100) { //right
+            if (pointerX >= x2) { //left
+                if (pointerY >= y2) { //top
+                    if (pointerY <= y2 + 100) { //bottom
+                        audio.play();
+                        screamF.play()
+                        score--
+                        scoreEl.innerHTML = score
+                        console.log(score)
+                        x2 = Math.floor(Math.random() * canvas.width - 50)
+                        y2 = Math.floor(Math.random() * canvas.height - 50)
+                    }
+                }
+
+            }
+
+        }
+
+        if (pointerX <= x1 + 100) { //right
+            if (pointerX >= x1) { //left
+                if (pointerY >= y1) { //top
+                    if (pointerY <= y1 + 100) { //bottom
+                        audio.play();
+                        x1 = Math.floor(Math.random() * canvas.width - 50)
+                        y1 = Math.floor(Math.random() * canvas.height - 50)
+                        screamM.play()
+                        t = Math.floor(Math.random() * 299 + 1)
+                        score++
+                        scoreEl.innerHTML = score
+                        console.log(score)
+                    }
+                }
+
+            }
+        }
+    }
+
+
+
+
+    startGameBtn.addEventListener('click', () => {
+        init()
+        modalEl.style.display = 'none'
+        startGame = true
+        console.log(startGame)
+
+    })
+
+</script>
