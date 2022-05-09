@@ -12,6 +12,10 @@
             display: block;
 
         }
+
+        img {
+            display: none;
+        }
     </style>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -20,27 +24,85 @@
 </head>
 
 <body>
-    <canvas></canvas>
+    <img src="player.png" id="spriteSheet">
+    <img src="wall.png" id="Wall">
 </body>
+<canvas></canvas>
 
 </html>
 <script>
     const canvas = document.querySelector('canvas');
     const c = canvas.getContext('2d');
+    img = document.getElementById("spriteSheet");
+    wall = document.getElementById("Wall");
 
     // i tried to make this code very simple and basic and not get very crazy and advanced so it should be easy to look throught 
 
     canvas.width = innerWidth;
     canvas.height = innerHeight;
 
-    addEventListener('keydown', keydown);
+    addEventListener('keydown', keydown, false)
+    addEventListener('keyup', keyup, false)
     addEventListener('mousedown', mouseDownHandler)
     addEventListener('mouseup', mouseUpHandler)
 
     document.onmousemove = function (event) {
-        playerX = event.pageX;
-        playerY = event.pageY;
+        // playerX = event.pageX;
+        // playerY = event.pageY;
     }
+
+    var playerOne = {
+        walkX: [319, 400, 490, 566, 646, 727],
+        walkY: [332, 332, 332, 332, 332, 332],
+        idleX: [52, 52, 52, 52, 52, 52],
+        idleY: [99, 99, 99, 99, 99, 99],
+        walkRightX: [733, 641, 550, 469, 387, 316],
+        walkRightY: [184, 184, 184, 184, 184, 184],
+        attackX: [231, 321, 449, 554],
+        attackY: [39, 39, 39, 39],
+        damageX: [150, 150, 150, 150, 150, 150],
+        damageY: [94, 94, 94, 94, 94, 94],
+    }
+
+    var ammo = {
+        arrowX: [727],
+        arrowY: [145],
+    }
+
+    var Enemy = {
+        walkLeftX: [279, 226, 170, 118, 75, 30],
+        walkLeftY: [397, 397, 397, 397, 397, 397],
+    }
+
+    var EnemyDamage = {
+        damageX: [0, 79],
+        damageY: [227, 227],
+    }
+
+    var sx = playerOne.idleX
+    var sy = playerOne.idleY
+
+    var SX = ammo.arrowX;
+    var SY = ammo.arrowY;
+
+    ex = Enemy.walkLeftX
+    ey = Enemy.walkLeftY
+
+    var dx = 100;
+    var dy = 100;
+
+    var width = 131
+    var height = 138
+
+    var wpres = false
+    var apres = false
+    var spres = false
+    var dpres = false
+
+    var spriteIndex = 0
+    var spriteIndex1 = 0
+    var spriteIndex2 = 0
+    var spriteIndex3 = 0
 
     var centX = canvas.width / 2;
     var centY = canvas.height / 2;
@@ -58,8 +120,8 @@
 
     var mouseClick = false;
 
-    var speedX = 5;
-    var speedY = 5; // same here
+    var speedX = 8;
+    var speedY = 8; // same here
 
     var EspeedX = 3;
     var EspeedY = 3;
@@ -69,29 +131,50 @@
 
     var numberEnemy = 1;
 
-    var shootCheck = 0; // do i really heve to explain what this does the name says exactly what it does if you get confused rember your the one who is suposed to be fixing the problem
+    var shootCheck = 0;
 
-    //setInterval(draw, 20); // this draws its really cool!!
+    var dx = 74
 
-    // i took and sepreated each part of the code into diffrent functions to make it easier to work on what each part does eventually i will put them into correct functions together 
-
-    // problem i cant figure out how to make the collsion with the bullet work sometimes it works and others it doesnt when it works the bullet will not spawn from the player position and only work for a few shots when it doesnt it just passes straight through the target also i cant get the player to move with the mouse but stay in the left side of the screen i have disabled the collsion for now to foucus on the bullet but with it on it just starts phasing around the screen
+    var wall = new Image()
+    wall.src = "../grad/wall.png"
 
     function int() {
 
     }
 
+    setInterval(spriteIndexSpeed, 150)
+    function spriteIndexSpeed() {
+        spriteIndex++
+        if (spriteIndex === 6) {
+            spriteIndex = 0
+        }
+        spriteIndex1++
+        if (spriteIndex1 === 1) {
+            spriteIndex1 = 0
+        }
+        spriteIndex2++
+        if (spriteIndex2 === 6) {
+            spriteIndex2 = 0
+        }
+        spriteIndex3++
+        if (spriteIndex3 === 2) {
+            spriteIndex3 = 0
+        }
+    }
     function playerCode() {
-
         c.clearRect(0, 0, centerX, centerY);
-        c.fillStyle = 'red'; // why red its so basic 
-        c.fillRect(playerX, playerY, 50, 50);
+        c.drawImage(img, sx[spriteIndex], sy[spriteIndex], dx, 128, playerX, playerY, width, height)
+
+        // c.fillStyle = 'red'; // why red its so basic 
+        // c.fillRect(playerX, playerY, 50, 50);
 
         if (shootCheck === 1) {
             for (let i = 0; i < shootX.length; i++) {
+                //image, sx, sy, sw, sh, dx, dy, dw, dh
+                c.drawImage(img, SX[spriteIndex1], SY[spriteIndex1], 88, 34, shootX[i], shootY[i], 88, 34)
 
-                c.fillStyle = 'white';
-                c.fillRect(shootX[i], shootY[i], 10, 10);
+                //c.fillStyle = 'white';
+                // c.fillRect(shootX[i], shootY[i], 10, 10);
                 shootX[i] = shootX[i] + speedX;
 
 
@@ -130,10 +213,14 @@
 
         for (let i = 0; i < enemyX.length; i++) {
             if (enemyX[i] + enemyWidth > playerX) { // is the right of the enemy right of the left of the player
-                if (enemyX[i] < playerX + 50) { //is the left of the enemy left of the right of the player
-                    if (enemyY[i] < playerY + 50) {//is the top of the enemy above of the bottom of the player
+                if (enemyX[i] < playerX + 74) { //is the left of the enemy left of the right of the player
+                    if (enemyY[i] < playerY + 128) {//is the top of the enemy above of the bottom of the player
                         if (enemyY[i] + enemyHeight > playerY) { // is the bottom of the enemy below of the top of the player
-                            console.log('hit')
+                            enemyX.splice(i, 1)
+                            enemyY.splice(i, 1)
+                            sx = playerOne.damageX
+                            sy = playerOne.damageY
+                            // c.clearRect(playerX, playerY, 74, 128)
                         }
                     }
                 }
@@ -157,6 +244,8 @@
                     if (shootX[j] < enemyX[i] + enemyWidth) { //left
                         if (shootY[j] > enemyY[i]) {//top
                             if (shootY[j] < enemyY[i] + enemyHeight) {//bottom
+                                ex = EnemyDamage.damageX
+                                ey = EnemyDamage.damageY
                                 shootX.splice(j, 1)
                                 shootY.splice(j, 1) //you have to delete ALL of your bullet variables, not just x
                                 enemyX.splice(i, 1)
@@ -175,9 +264,10 @@
 
     function enemy() {
         for (let i = 0; i < enemyX.length; i++) {
-
-            c.fillStyle = 'green';
-            c.fillRect(enemyX[i], enemyY[i], enemyWidth, enemyHeight)
+            c.drawImage(img, ex[spriteIndex2], ey[spriteIndex2], 44, 88, enemyX[i], enemyY[i], 100, 100)
+            
+            // c.fillStyle = 'green';
+            // c.fillRect(enemyX[i], enemyY[i], enemyWidth, enemyHeight)
         }
 
 
@@ -187,25 +277,76 @@
 
     function keydown(e) {
         if (e.key === 'w') {
-            playerY = playerY - 10;
-        };
+            wpres = true
+            playerY = playerY - 9
+            sx = playerOne.walkX
+            sy = playerOne.walkY
+        }
         if (e.key === 'a') {
-            playerX = playerX - 10;
-        };
+            apres = true
+            playerX = playerX - 9
+            sx = playerOne.walkRightX
+            sy = playerOne.walkRightY
+
+        }
         if (e.key === 's') {
-            playerY = playerY + 10;
-        };
+            spres = true
+            playerY = playerY + 9
+            sx = playerOne.walkX
+            sy = playerOne.walkY
+        }
         if (e.key === 'd') {
-            playerX = playerX + 10;
-        };
+            dpres = true
+            playerX = playerX + 9
+            sx = playerOne.walkX
+            sy = playerOne.walkY
+        }
+
+
+    }
+
+    function keyup(e) {
+        if (e.key === 'w') {
+            wpres = false
+            sx = playerOne.idleX
+            sy = playerOne.idleY
+        }
+        if (e.key === 'a') {
+            apres = false
+            sx = playerOne.idleX
+            sy = playerOne.idleY
+        }
+        if (e.key === 's') {
+            spres = false
+            sx = playerOne.idleX
+            sy = playerOne.idleY
+        }
+        if (e.key === 'd') {
+            dpres = false
+            sx = playerOne.idleX
+            sy = playerOne.idleY
+        }
+
     }
 
     function mouseDownHandler() {
         mouseClick = true;
+        sx = playerOne.attackX
+        sy = playerOne.attackY
+
+        width = 131;
+        height = 138
+        dx = 100
     }
 
     function mouseUpHandler() {
         mouseClick = false;
+        sx = playerOne.idleX
+        sy = playerOne.idleY
+
+        width = 131;
+        height = 138
+        dx = 74
     }
 
     function animate() { // i used animate here to make it simplaer to have a constant fps you can change the name to draw and do a set interval for the same effect 
