@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <style>
+        body {
+            background: black;
+            margin: 0;
+        }
+
+        canvas {
+            display: block;
+
+        }
+    </style>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <canvas></canvas>
+</body>
+
+</html>
+<script>
+    const canvas = document.querySelector('canvas');
+    const c = canvas.getContext('2d');
+
+    // i tried to make this code very simple and basic and not get very crazy and advanced so it should be easy to look throught 
+
+    canvas.width = innerWidth;
+    canvas.height = innerHeight;
+
+    addEventListener('keydown', keydown);
+    addEventListener('mousedown', mouseDownHandler)
+    addEventListener('mouseup', mouseUpHandler)
+
+    document.onmousemove = function (event) {
+        playerX = event.pageX;
+        playerY = event.pageY;
+    }
+
+    var centX = canvas.width / 2;
+    var centY = canvas.height / 2;
+
+    var enemyX = []//centX;
+    var enemyY = []//centY;
+    var enemyHeight = 30
+    var enemyWidth = 30
+
+    var centerX = canvas.width;
+    var centerY = canvas.height; // why i did this i have no idea maby i will think of the reason why at some point maby
+
+    var playerX = 0;
+    var playerY = 370; // basic really it cant be simpler
+
+    var mouseClick = false;
+
+    var speedX = 5;
+    var speedY = 5; // same here
+
+    var EspeedX = 3;
+    var EspeedY = 3;
+
+    var shootX = [];
+    var shootY = []; // and here as well
+
+    var numberEnemy = 1;
+
+    var shootCheck = 0; // do i really heve to explain what this does the name says exactly what it does if you get confused rember your the one who is suposed to be fixing the problem
+
+    //setInterval(draw, 20); // this draws its really cool!!
+
+    // i took and sepreated each part of the code into diffrent functions to make it easier to work on what each part does eventually i will put them into correct functions together 
+
+    // problem i cant figure out how to make the collsion with the bullet work sometimes it works and others it doesnt when it works the bullet will not spawn from the player position and only work for a few shots when it doesnt it just passes straight through the target also i cant get the player to move with the mouse but stay in the left side of the screen i have disabled the collsion for now to foucus on the bullet but with it on it just starts phasing around the screen
+
+    function int() {
+
+    }
+
+    function playerCode() {
+
+        c.clearRect(0, 0, centerX, centerY);
+        c.fillStyle = 'red'; // why red its so basic 
+        c.fillRect(playerX, playerY, 50, 50);
+
+        if (shootCheck === 1) {
+            for (let i = 0; i < shootX.length; i++) {
+
+                c.fillStyle = 'white';
+                c.fillRect(shootX[i], shootY[i], 10, 10);
+                shootX[i] = shootX[i] + speedX;
+
+
+            }
+        }
+    }
+
+    function collsion() {
+        // collsion code for player
+        if (playerX > 200) {
+            playerX = 200;
+        };
+
+        if (playerY > canvas.height - 50) {
+            playerY = canvas.height - 50;
+        };
+
+        if (playerX < 0) {
+            playerX = 0;
+        };
+
+        if (playerY < 0) {
+            playerY = 0;
+        };
+
+        /*
+        my really dumb way to remember is 
+        the right to the left
+        the left to the right
+        the top above the bottom
+        and the bottom below the top
+
+        if that's all true then you're touching.
+        https://developer.mozilla.org/en-US/docs/Games/Techniques/2D_collision_detection
+        */
+
+        for (let i = 0; i < enemyX.length; i++) {
+            if (enemyX[i] + enemyWidth > playerX) { // is the right of the enemy right of the left of the player
+                if (enemyX[i] < playerX + 50) { //is the left of the enemy left of the right of the player
+                    if (enemyY[i] < playerY + 50) {//is the top of the enemy above of the bottom of the player
+                        if (enemyY[i] + enemyHeight > playerY) { // is the bottom of the enemy below of the top of the player
+                            console.log('hit')
+                        }
+                    }
+                }
+            }
+
+        }
+
+        // bullet collsion
+        for (let i = 0; i < shootX.length; i++) {
+            //delete when they go off the screen
+            if (shootX[i] > canvas.width) { //is this [i] bullet off of the screen
+                shootX.splice(i, 1)
+                shootY.splice(i, 1) //you have to delete ALL of your bullet variables, not just x
+            }
+
+        }
+
+        for (let i = 0; i < enemyX.length; i++) {
+            for (let j = 0; j < shootX.length; j++) {
+                if (shootX[j] > enemyX[i]) {//right 
+                    if (shootX[j] < enemyX[i] + enemyWidth) { //left
+                        if (shootY[j] > enemyY[i]) {//top
+                            if (shootY[j] < enemyY[i] + enemyHeight) {//bottom
+                                shootX.splice(j, 1)
+                                shootY.splice(j, 1) //you have to delete ALL of your bullet variables, not just x
+                                enemyX.splice(i, 1)
+                                enemyY.splice(i, 1)
+
+                            }
+                        }
+                    }
+
+                }
+
+            }
+
+        }
+    }
+
+    function enemy() {
+        for (let i = 0; i < enemyX.length; i++) {
+
+            c.fillStyle = 'green';
+            c.fillRect(enemyX[i], enemyY[i], enemyWidth, enemyHeight)
+        }
+
+
+        //c.fillStyle = 'blue'
+        //c.fillRect(enemyX, enemyY, 50, 50)
+    }
+
+    function keydown(e) {
+        if (e.key === 'w') {
+            playerY = playerY - 10;
+        };
+        if (e.key === 'a') {
+            playerX = playerX - 10;
+        };
+        if (e.key === 's') {
+            playerY = playerY + 10;
+        };
+        if (e.key === 'd') {
+            playerX = playerX + 10;
+        };
+    }
+
+    function mouseDownHandler() {
+        mouseClick = true;
+    }
+
+    function mouseUpHandler() {
+        mouseClick = false;
+    }
+
+    function animate() { // i used animate here to make it simplaer to have a constant fps you can change the name to draw and do a set interval for the same effect 
+        collsion();
+        playerCode();
+        enemy();
+
+        if (mouseClick === true) {
+            shootX.push(playerX + 50)
+            shootY.push(playerY + 15)
+            shootCheck = 1
+            mouseClick = false;
+        }
+
+        if (enemyX.length <= 0) {
+            for (let i = 0; i < numberEnemy; i++) {
+                enemyX.push(Math.floor(Math.random() * 400 + canvas.width));
+                // enemyX.push(Math.floor(Math.random() * 400 + 800));
+                enemyY.push(Math.floor(Math.random() * (canvas.height - 100) + 50));
+
+            }
+            numberEnemy = numberEnemy * 2
+        }
+
+        for (let i = 0; i < enemyX.length; i++) {
+            enemyX[i] = enemyX[i] - EspeedX
+        }
+
+        /*c.strokeStyle = "red"
+        c.strokeWeight = "10"
+        c.beginPath()
+        c.moveTo(shootX, shootY)
+        c.lineTo(enemyX, enemyY)
+        c.stroke()*/
+        requestAnimationFrame(animate)
+    }
+    animate()
+
+</script>
