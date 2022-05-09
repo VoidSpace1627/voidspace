@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            background: black;
+            margin: 0;
+            height: 100vh;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+
+</body>
+<canvas></canvas>
+
+</html>
+<script>
+    const canvas = document.querySelector('canvas');
+    const c = canvas.getContext('2d');
+
+    canvas.width = innerWidth;
+    canvas.height = innerHeight;
+
+    var x = 0;
+    var y = 0;
+
+    var centX = canvas.width / 2;
+    var centY = canvas.height / 2;
+
+    var pointerX = -1;
+    var pointerY = -1;
+
+    var apres = false;
+    var dpres = false;
+
+    var count = 0;
+
+    addEventListener('keypress', keydown, false);
+    addEventListener('keypress', keyup, false);
+
+    function keydown(e) {
+        if (e.key === 'a') {
+            apres = true;
+            count--
+        };
+        if (e.key === 'd') {
+            dpres = true;
+            count++
+        };
+    };
+
+    function keyup(e) {
+        if (e.key === 'a') {
+            apres = false;
+        };
+        if (e.key === 'd') {
+            dpres = false;
+        };
+    };
+
+    document.onmousemove = function (event) {
+        pointerX = event.pageX;
+        pointerY = event.pageY;
+    };
+
+    setInterval(draw, 10);
+
+    function square() {
+        c.clearRect(0, 0, canvas.width, canvas.height)
+        c.shadowColor = 'hsl(' + pointerY + ',100%, 50%)';
+        c.shadowOffsetX = centX + 1000;
+        c.shadowOffsetY = centY - 330;
+        c.shadowBlur = count;
+        c.fillRect(-1000, 0, 660, 660);
+
+        if (apres === true) {
+            count--
+        }
+        if (dpres === true) {
+            count++
+        }
+    };
+
+    function draw() {
+        square();
+    };
+</script>

@@ -62,6 +62,7 @@
     addEventListener('load', function () {
         const canvas = document.querySelector('canvas');
         const c = canvas.getContext('2d')
+        
         canvas.width = innerWidth;
         canvas.height = innerHeight;
 
@@ -93,11 +94,11 @@
 
         const slider_sides = document.getElementById('sides')
         const lable_sides = document.querySelector('[for="sides"]')
-        slider_sides.addEventListener('change', function(e){
+        //slider_sides.addEventListener('change', function(e){
             //branches = e.target.value
             //drawFractle()
-            console.log(e)
-        })
+            //console.log(e)
+       // })
 
         function updateSliders() {
             slider_spread.value = spread

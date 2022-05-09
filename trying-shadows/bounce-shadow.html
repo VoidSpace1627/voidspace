@@ -1,0 +1,60 @@
+<!DOCTYPE>
+<html>
+
+<head>
+    <style>
+        body {
+            background: rgb(0, 0, 0);
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+</body>
+
+</html>
+<canvas></canvas>
+<script>
+    const canvas = document.querySelector('canvas');
+    const c = canvas.getContext('2d');
+
+    canvas.width = innerWidth;
+    canvas.height = innerHeight;
+
+    var x = 200;
+    var y = 100;
+    var speedX = 5;
+    var speedY = 5;
+
+    setInterval(draw, 50);
+
+    function draw() {
+        c.clearRect(0, 0, canvas.width, canvas.height);
+
+        c.beginPath();
+        c.arc(x, y, 50, 0, 2 * Math.PI);
+        c.fillStyle = 'rgb(' + y + ', 0, 0)';
+        c.fill();
+
+        c.shadowColor = 'rgb(' + y + ', 0, 0)';
+        c.shadowOffsetX = 0;
+        c.shadowOffsetY = -speedY;
+        c.shadowBlur = speedY;
+        y = y + speedY;
+
+        if (y >= canvas.height) {
+            speedY -= 5;
+        };
+        bounce();
+
+    }
+
+    function bounce() {
+        speedY++;
+    };
+
+
+</script>
