@@ -85,8 +85,8 @@
     var SX = ammo.arrowX;
     var SY = ammo.arrowY;
 
-    ex = Enemy.walkLeftX
-    ey = Enemy.walkLeftY
+    var ex = [] //Enemy.walkLeftX
+    var ey =[] //Enemy.walkLeftY
 
     var dx = 100;
     var dy = 100;
@@ -129,7 +129,7 @@
     var shootX = [];
     var shootY = []; // and here as well
 
-    var numberEnemy = 1;
+    var numberEnemy = 5;
 
     var shootCheck = 0;
 
@@ -212,6 +212,9 @@
         */
 
         for (let i = 0; i < enemyX.length; i++) {
+            if (enemyX[i] < 200) {
+                    enemyX.splice(i, 1)
+                };
             if (enemyX[i] + enemyWidth > playerX) { // is the right of the enemy right of the left of the player
                 if (enemyX[i] < playerX + 74) { //is the left of the enemy left of the right of the player
                     if (enemyY[i] < playerY + 128) {//is the top of the enemy above of the bottom of the player
@@ -244,12 +247,13 @@
                     if (shootX[j] < enemyX[i] + enemyWidth) { //left
                         if (shootY[j] > enemyY[i]) {//top
                             if (shootY[j] < enemyY[i] + enemyHeight) {//bottom
-                                ex = EnemyDamage.damageX
-                                ey = EnemyDamage.damageY
+                                ex[i] = EnemyDamage.damageX
+                                ey[i] = EnemyDamage.damageY
                                 shootX.splice(j, 1)
                                 shootY.splice(j, 1) //you have to delete ALL of your bullet variables, not just x
                                 enemyX.splice(i, 1)
                                 enemyY.splice(i, 1)
+
 
                             }
                         }
@@ -264,8 +268,8 @@
 
     function enemy() {
         for (let i = 0; i < enemyX.length; i++) {
-            c.drawImage(img, ex[spriteIndex2], ey[spriteIndex2], 44, 88, enemyX[i], enemyY[i], 100, 100)
-            
+            c.drawImage(img, ex[i][spriteIndex2], ey[i][spriteIndex2], 44, 88, enemyX[i], enemyY[i], 100, 100)
+
             // c.fillStyle = 'green';
             // c.fillRect(enemyX[i], enemyY[i], enemyWidth, enemyHeight)
         }
@@ -363,6 +367,8 @@
 
         if (enemyX.length <= 0) {
             for (let i = 0; i < numberEnemy; i++) {
+                ex.push(Enemy.walkLeftX);
+                ey.push(Enemy.walkLeftY);
                 enemyX.push(Math.floor(Math.random() * 400 + canvas.width));
                 // enemyX.push(Math.floor(Math.random() * 400 + 800));
                 enemyY.push(Math.floor(Math.random() * (canvas.height - 100) + 50));
