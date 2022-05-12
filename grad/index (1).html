@@ -72,11 +72,15 @@
     var Enemy = {
         walkLeftX: [279, 226, 170, 118, 75, 30],
         walkLeftY: [397, 397, 397, 397, 397, 397],
+        walkWidth: [44, 44, 44, 44, 44, 44],
+        walkHeight: [88, 88, 88, 88, 88, 88],
     }
 
     var EnemyDamage = {
-        damageX: [0, 79],
-        damageY: [227, 227],
+        damageX: [280, 226, 165, 84],
+        damageY: [228, 228, 228, 228],
+        damageWidth: [50, 50, 65, 61, 58, 44, 37, 39],
+        damageHeight: [83, 83, 75, 80, 76, 87, 91, 98],
     }
 
     var sx = playerOne.idleX
@@ -86,7 +90,21 @@
     var SY = ammo.arrowY;
 
     var ex = [] //Enemy.walkLeftX
-    var ey =[] //Enemy.walkLeftY
+    var ey = [] //Enemy.walkLeftY
+    var ew = [] //Enemy.walkLeftX
+    var eh = [] //Enemy.walkLeftY
+    var enemyX = []//centX;
+    var enemyY = []//centY;
+    var dead = [];
+    var frameCount = [];
+
+    var enemyHeight = 100
+    var enemyWidth = 100
+
+    var numberEnemy = 1;
+
+    var EspeedX = 3;
+    var EspeedY = 3;
 
     var dx = 100;
     var dy = 100;
@@ -101,16 +119,9 @@
 
     var spriteIndex = 0
     var spriteIndex1 = 0
-    var spriteIndex2 = 0
-    var spriteIndex3 = 0
 
     var centX = canvas.width / 2;
     var centY = canvas.height / 2;
-
-    var enemyX = []//centX;
-    var enemyY = []//centY;
-    var enemyHeight = 30
-    var enemyWidth = 30
 
     var centerX = canvas.width;
     var centerY = canvas.height; // why i did this i have no idea maby i will think of the reason why at some point maby
@@ -123,20 +134,12 @@
     var speedX = 8;
     var speedY = 8; // same here
 
-    var EspeedX = 3;
-    var EspeedY = 3;
-
     var shootX = [];
     var shootY = []; // and here as well
-
-    var numberEnemy = 5;
 
     var shootCheck = 0;
 
     var dx = 74
-
-    var wall = new Image()
-    wall.src = "../grad/wall.png"
 
     function int() {
 
@@ -145,22 +148,36 @@
     setInterval(spriteIndexSpeed, 150)
     function spriteIndexSpeed() {
         spriteIndex++
-        if (spriteIndex === 6) {
+        if (spriteIndex === 6) { /// player
             spriteIndex = 0
         }
         spriteIndex1++
-        if (spriteIndex1 === 1) {
+        if (spriteIndex1 === 1) { // bullet
             spriteIndex1 = 0
         }
-        spriteIndex2++
-        if (spriteIndex2 === 6) {
-            spriteIndex2 = 0
+        for (let i = 0; i < enemyX.length; i++) {
+            if (dead[i]) {
+                frameCount[i]++
+                if (frameCount[i] === 8) { // enemy
+                    enemyX.splice(i, 1)
+                    enemyY.splice(i, 1)
+                    ex.splice(i, 1)
+                    ey.splice(i, 1)
+                    dead.splice(i, 1)
+                    frameCount.splice(i, 1)
+                }
+
+            } else {
+                frameCount[i]++
+                if (frameCount[i] === 6) { // enemy
+                    frameCount[i] = 0
+                }
+            }
         }
-        spriteIndex3++
-        if (spriteIndex3 === 2) {
-            spriteIndex3 = 0
-        }
+
+
     }
+
     function playerCode() {
         c.clearRect(0, 0, centerX, centerY);
         c.drawImage(img, sx[spriteIndex], sy[spriteIndex], dx, 128, playerX, playerY, width, height)
@@ -210,11 +227,11 @@
         if that's all true then you're touching.
         https://developer.mozilla.org/en-US/docs/Games/Techniques/2D_collision_detection
         */
-
+        // enemy collsion
         for (let i = 0; i < enemyX.length; i++) {
             if (enemyX[i] < 200) {
-                    enemyX.splice(i, 1)
-                };
+                enemyX.splice(i, 1)
+            };
             if (enemyX[i] + enemyWidth > playerX) { // is the right of the enemy right of the left of the player
                 if (enemyX[i] < playerX + 74) { //is the left of the enemy left of the right of the player
                     if (enemyY[i] < playerY + 128) {//is the top of the enemy above of the bottom of the player
@@ -249,10 +266,13 @@
                             if (shootY[j] < enemyY[i] + enemyHeight) {//bottom
                                 ex[i] = EnemyDamage.damageX
                                 ey[i] = EnemyDamage.damageY
+                                ew[i] = EnemyDamage.damageWidth
+                                eh[i] = EnemyDamage.damageWidth
                                 shootX.splice(j, 1)
                                 shootY.splice(j, 1) //you have to delete ALL of your bullet variables, not just x
-                                enemyX.splice(i, 1)
-                                enemyY.splice(i, 1)
+                                dead[i] = true;
+                                frameCount[i] = 0
+
 
 
                             }
@@ -266,17 +286,19 @@
         }
     }
 
-    function enemy() {
+    function drawEnemy() {
         for (let i = 0; i < enemyX.length; i++) {
-            c.drawImage(img, ex[i][spriteIndex2], ey[i][spriteIndex2], 44, 88, enemyX[i], enemyY[i], 100, 100)
+             frameCount[i] = 3
+             c.fillStyle = 'lightgreen'
+             c.fillRect(enemyX[i], enemyY[i],ew[i][frameCount[i]], eh[i][frameCount[i]])
+            c.drawImage(img, ex[i][frameCount[i]], ey[i][frameCount[i]], ew[i][frameCount[i]], eh[i][frameCount[i]], enemyX[i], enemyY[i], ew[i][frameCount[i]], eh[i][frameCount[i]])
+            ew[i] = EnemyDamage.damageWidth // delet
+            eh[i] = EnemyDamage.damageHeight
+            ex[i] = EnemyDamage.damageX
+            ey[i] = EnemyDamage.damageY
+            
 
-            // c.fillStyle = 'green';
-            // c.fillRect(enemyX[i], enemyY[i], enemyWidth, enemyHeight)
         }
-
-
-        //c.fillStyle = 'blue'
-        //c.fillRect(enemyX, enemyY, 50, 50)
     }
 
     function keydown(e) {
@@ -356,7 +378,7 @@
     function animate() { // i used animate here to make it simplaer to have a constant fps you can change the name to draw and do a set interval for the same effect 
         collsion();
         playerCode();
-        enemy();
+        drawEnemy();
 
         if (mouseClick === true) {
             shootX.push(playerX + 50)
@@ -365,28 +387,28 @@
             mouseClick = false;
         }
 
-        if (enemyX.length <= 0) {
+        if (enemyX.length <= 0) { // zombie spawn
             for (let i = 0; i < numberEnemy; i++) {
                 ex.push(Enemy.walkLeftX);
                 ey.push(Enemy.walkLeftY);
-                enemyX.push(Math.floor(Math.random() * 400 + canvas.width));
+                ew.push(Enemy.walkWidth);
+                eh.push(Enemy.walkHeight);
+                frameCount.push(0);
+                dead.push(false);
+                enemyX.push(500)//Math.floor(Math.random() * 400 + canvas.width));
                 // enemyX.push(Math.floor(Math.random() * 400 + 800));
-                enemyY.push(Math.floor(Math.random() * (canvas.height - 100) + 50));
+                enemyY.push(500)//Math.floor(Math.random() * (canvas.height - 100) + 50));
 
             }
             numberEnemy = numberEnemy * 2
         }
 
         for (let i = 0; i < enemyX.length; i++) {
-            enemyX[i] = enemyX[i] - EspeedX
+            if (!dead[i]) { //delet
+               // enemyX[i] = enemyX[i] - EspeedX
+            }
         }
 
-        /*c.strokeStyle = "red"
-        c.strokeWeight = "10"
-        c.beginPath()
-        c.moveTo(shootX, shootY)
-        c.lineTo(enemyX, enemyY)
-        c.stroke()*/
         requestAnimationFrame(animate)
     }
     animate()
