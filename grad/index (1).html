@@ -25,7 +25,6 @@
 
 <body>
     <img src="player.png" id="spriteSheet">
-    <img src="wall.png" id="Wall">
 </body>
 <canvas></canvas>
 
@@ -34,7 +33,6 @@
     const canvas = document.querySelector('canvas');
     const c = canvas.getContext('2d');
     img = document.getElementById("spriteSheet");
-    wall = document.getElementById("Wall");
 
     // i tried to make this code very simple and basic and not get very crazy and advanced so it should be easy to look throught 
 
@@ -47,14 +45,20 @@
     addEventListener('mouseup', mouseUpHandler)
 
     document.onmousemove = function (event) {
-        // playerX = event.pageX;
-        // playerY = event.pageY;
+        pointerX = event.pageX;
+        pointerY = event.pageY;
     }
+
+    var pointerX
+    var pointerY
+
+    var playerXCent = playerX + 50;
+    var playerYCent = playerY + 15;
 
     var playerOne = {
         walkX: [319, 400, 490, 566, 646, 727],
         walkY: [332, 332, 332, 332, 332, 332],
-        idleX: [52, 52, 52, 52, 52, 52],
+        idleX: [20, 20, 20, 20, 20, 20],
         idleY: [99, 99, 99, 99, 99, 99],
         walkRightX: [733, 641, 550, 469, 387, 316],
         walkRightY: [184, 184, 184, 184, 184, 184],
@@ -69,47 +73,13 @@
         arrowY: [145],
     }
 
-    var Enemy = {
-        walkLeftX: [279, 226, 170, 118, 75, 30],
-        walkLeftY: [397, 397, 397, 397, 397, 397],
-        walkWidth: [44, 44, 44, 44, 44, 44],
-        walkHeight: [88, 88, 88, 88, 88, 88],
-    }
-
-    var EnemyDamage = {
-        damageX: [280, 226, 165, 84],
-        damageY: [228, 228, 228, 228],
-        damageWidth: [50, 50, 65, 61, 58, 44, 37, 39],
-        damageHeight: [83, 83, 75, 80, 76, 87, 91, 98],
-    }
-
     var sx = playerOne.idleX
     var sy = playerOne.idleY
 
     var SX = ammo.arrowX;
     var SY = ammo.arrowY;
 
-    var ex = [] //Enemy.walkLeftX
-    var ey = [] //Enemy.walkLeftY
-    var ew = [] //Enemy.walkLeftX
-    var eh = [] //Enemy.walkLeftY
-    var enemyX = []//centX;
-    var enemyY = []//centY;
-    var dead = [];
-    var frameCount = [];
-
-    var enemyHeight = 100
-    var enemyWidth = 100
-
-    var numberEnemy = 1;
-
-    var EspeedX = 3;
-    var EspeedY = 3;
-
-    var dx = 100;
-    var dy = 100;
-
-    var width = 131
+    var width = 120
     var height = 138
 
     var wpres = false
@@ -134,18 +104,62 @@
     var speedX = 8;
     var speedY = 8; // same here
 
-    var shootX = [];
-    var shootY = []; // and here as well
+    //var shootX = [];
+    //var shootY = []; // and here as well
+
+    var shoot = {
+        x: [pointerX],
+        y: [pointerY],
+        vx: pointerX,
+        vy: pointerY,
+    }
 
     var shootCheck = 0;
 
     var dx = 74
+
+    var Enemy = {
+        walkLeftX: [279, 226, 170, 118, 75, 30],
+        walkLeftY: [397, 397, 397, 397, 397, 397],
+        walkWidth: [44, 44, 44, 44, 44, 44],
+        walkHeight: [88, 88, 88, 88, 88, 88],
+    }
+
+    var EnemyDamage = {
+        damageX: [280, 226, 165, 84, 1, 231, 132, 28, 28, 28, 28],
+        damageY: [228, 228, 228, 228, 228, 320, 320, 320, 320, 320, 320],
+        damageWidth: [50, 50, 65, 81, 75, 85, 93, 99, 99, 99, 99],
+        damageHeight: [83, 83, 80, 81, 81, 60, 60, 60, 60, 60, 60],
+    }
+
+    var ex = [] //Enemy.walkLeftX
+    var ey = [] //Enemy.walkLeftY
+    var ew = [] //Enemy.walkLeftX
+    var eh = [] //Enemy.walkLeftY
+    var enemyX = []//centX;
+    var enemyY = []//centY;
+    var dead = [];
+    var frameCount = [];
+
+    var enemyHeight = 100
+    var enemyWidth = 100
+
+    var numberEnemy = 1;
+
+    var EspeedX = 1;
+    var EspeedY = 3;
+
+    var dx = 100;
+    var dy = 100;
+
+    var points = 2;
 
     function int() {
 
     }
 
     setInterval(spriteIndexSpeed, 150)
+    setInterval(deadAnimationSpeed, 180)
     function spriteIndexSpeed() {
         spriteIndex++
         if (spriteIndex === 6) { /// player
@@ -155,10 +169,16 @@
         if (spriteIndex1 === 1) { // bullet
             spriteIndex1 = 0
         }
+
+    }
+
+    function deadAnimationSpeed() {
         for (let i = 0; i < enemyX.length; i++) {
             if (dead[i]) {
                 frameCount[i]++
-                if (frameCount[i] === 8) { // enemy
+                ew[i] = EnemyDamage.damageWidth
+                eh[i] = EnemyDamage.damageHeight
+                if (frameCount[i] === 11) { // enemy
                     enemyX.splice(i, 1)
                     enemyY.splice(i, 1)
                     ex.splice(i, 1)
@@ -174,30 +194,26 @@
                 }
             }
         }
-
-
     }
 
     function playerCode() {
         c.clearRect(0, 0, centerX, centerY);
         c.drawImage(img, sx[spriteIndex], sy[spriteIndex], dx, 128, playerX, playerY, width, height)
 
-        // c.fillStyle = 'red'; // why red its so basic 
-        // c.fillRect(playerX, playerY, 50, 50);
-
         if (shootCheck === 1) {
-            for (let i = 0; i < shootX.length; i++) {
+            for (let i = 0; i < shoot.x.length; i++) {
                 //image, sx, sy, sw, sh, dx, dy, dw, dh
-                c.drawImage(img, SX[spriteIndex1], SY[spriteIndex1], 88, 34, shootX[i], shootY[i], 88, 34)
+                c.drawImage(img, SX[spriteIndex1], SY[spriteIndex1], 88, 34, shoot.x[i], shoot.y[i], 88, 34)
 
-                //c.fillStyle = 'white';
-                // c.fillRect(shootX[i], shootY[i], 10, 10);
-                shootX[i] = shootX[i] + speedX;
+                shoot.x[i] = shoot.y[i] = pointerX + speedX
+                shoot.y[i] = shoot.y[i] = pointerY + speedY
 
+                //shoot.x[i] = shoot.x[i] + speedX;
 
             }
         }
     }
+    
 
     function collsion() {
         // collsion code for player
@@ -240,7 +256,7 @@
                             enemyY.splice(i, 1)
                             sx = playerOne.damageX
                             sy = playerOne.damageY
-                            // c.clearRect(playerX, playerY, 74, 128)
+                            points = points - 1
                         }
                     }
                 }
@@ -249,31 +265,31 @@
         }
 
         // bullet collsion
-        for (let i = 0; i < shootX.length; i++) {
+        for (let i = 0; i < shoot.x.length; i++) {
             //delete when they go off the screen
-            if (shootX[i] > canvas.width) { //is this [i] bullet off of the screen
-                shootX.splice(i, 1)
-                shootY.splice(i, 1) //you have to delete ALL of your bullet variables, not just x
+            if (shoot.x[i] > canvas.width) { //is this [i] bullet off of the screen
+                shoot.x.splice(i, 1)
+                shoot.y.splice(i, 1) //you have to delete ALL of your bullet variables, not just x
             }
 
         }
 
         for (let i = 0; i < enemyX.length; i++) {
-            for (let j = 0; j < shootX.length; j++) {
-                if (shootX[j] > enemyX[i]) {//right 
-                    if (shootX[j] < enemyX[i] + enemyWidth) { //left
-                        if (shootY[j] > enemyY[i]) {//top
-                            if (shootY[j] < enemyY[i] + enemyHeight) {//bottom
+            for (let j = 0; j < shoot.x.length; j++) {
+                if (shoot.x[j] > enemyX[i]) {//right 
+                    if (shoot.x[j] < enemyX[i] + enemyWidth) { //left
+                        if (shoot.y[j] > enemyY[i]) {//top
+                            if (shoot.y[j] < enemyY[i] + enemyHeight) {//bottom
                                 ex[i] = EnemyDamage.damageX
                                 ey[i] = EnemyDamage.damageY
                                 ew[i] = EnemyDamage.damageWidth
                                 eh[i] = EnemyDamage.damageWidth
-                                shootX.splice(j, 1)
-                                shootY.splice(j, 1) //you have to delete ALL of your bullet variables, not just x
+                                shoot.x.splice(j, 1)
+                                shoot.y.splice(j, 1)
                                 dead[i] = true;
                                 frameCount[i] = 0
-
-
+                                points = points + 1
+                                console.log(points)
 
                             }
                         }
@@ -288,15 +304,20 @@
 
     function drawEnemy() {
         for (let i = 0; i < enemyX.length; i++) {
-             frameCount[i] = 3
-             c.fillStyle = 'lightgreen'
-             c.fillRect(enemyX[i], enemyY[i],ew[i][frameCount[i]], eh[i][frameCount[i]])
+            //  frameCount[i] = 8
             c.drawImage(img, ex[i][frameCount[i]], ey[i][frameCount[i]], ew[i][frameCount[i]], eh[i][frameCount[i]], enemyX[i], enemyY[i], ew[i][frameCount[i]], eh[i][frameCount[i]])
-            ew[i] = EnemyDamage.damageWidth // delet
-            eh[i] = EnemyDamage.damageHeight
-            ex[i] = EnemyDamage.damageX
-            ey[i] = EnemyDamage.damageY
-            
+
+            if (!dead[i]) {
+                ew[i] = Enemy.walkWidth;
+                eh[i] = Enemy.walkHeight;
+            }
+
+            // ew[i] = EnemyDamage.damageWidth
+            // eh[i] = EnemyDamage.damageHeight
+            // ex[i] = EnemyDamage.damageX
+            // ey[i] = EnemyDamage.damageY
+
+
 
         }
     }
@@ -360,6 +381,7 @@
         sx = playerOne.attackX
         sy = playerOne.attackY
 
+
         width = 131;
         height = 138
         dx = 100
@@ -370,21 +392,38 @@
         sx = playerOne.idleX
         sy = playerOne.idleY
 
-        width = 131;
+        width = 120;
         height = 138
-        dx = 74
+        dx = 100
     }
 
+    function upgrades() {
+        // laser sight 
+        if (points === 2) {
+            c.strokeStyle = "red"
+            c.strokeWeight = "10"
+            c.beginPath()
+            c.moveTo(playerX + 50, playerY + 15)
+            c.lineTo(pointerX, pointerY)
+            c.stroke()
+            
+        }
+    }
+
+    
     function animate() { // i used animate here to make it simplaer to have a constant fps you can change the name to draw and do a set interval for the same effect 
         collsion();
         playerCode();
         drawEnemy();
+        upgrades();
 
+        console.log();
         if (mouseClick === true) {
-            shootX.push(playerX + 50)
-            shootY.push(playerY + 15)
+            shoot.x.push(playerX)
+            shoot.y.push(playerY + 15)
             shootCheck = 1
             mouseClick = false;
+
         }
 
         if (enemyX.length <= 0) { // zombie spawn
@@ -395,22 +434,22 @@
                 eh.push(Enemy.walkHeight);
                 frameCount.push(0);
                 dead.push(false);
-                enemyX.push(500)//Math.floor(Math.random() * 400 + canvas.width));
-                // enemyX.push(Math.floor(Math.random() * 400 + 800));
-                enemyY.push(500)//Math.floor(Math.random() * (canvas.height - 100) + 50));
+                enemyX.push(Math.floor(Math.random() * 400 + canvas.width));
+                enemyY.push(Math.floor(Math.random() * (canvas.height - 100) + 50));
 
             }
             numberEnemy = numberEnemy * 2
         }
 
         for (let i = 0; i < enemyX.length; i++) {
-            if (!dead[i]) { //delet
-               // enemyX[i] = enemyX[i] - EspeedX
+            if (!dead[i]) {
+                enemyX[i] = enemyX[i] - EspeedX
             }
         }
 
         requestAnimationFrame(animate)
     }
-    animate()
+    animate() 
+
 
 </script>
