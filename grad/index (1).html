@@ -73,6 +73,18 @@
         arrowY: [145],
     }
 
+    var shootSpeed = 5
+
+    var shoot = {
+        x: [],
+        y: [],
+        vx: [],
+        vy: [],
+        angle: [],
+    }
+
+    var shootCheck = 0;
+
     var sx = playerOne.idleX
     var sy = playerOne.idleY
 
@@ -103,18 +115,6 @@
 
     var speedX = 8;
     var speedY = 8; // same here
-
-    //var shootX = [];
-    //var shootY = []; // and here as well
-
-    var shoot = {
-        x: [pointerX],
-        y: [pointerY],
-        vx: pointerX,
-        vy: pointerY,
-    }
-
-    var shootCheck = 0;
 
     var dx = 74
 
@@ -159,10 +159,11 @@
     }
 
     setInterval(spriteIndexSpeed, 150)
-    setInterval(deadAnimationSpeed, 180)
+    setInterval(deadAnimationSpeed, 150)
+
     function spriteIndexSpeed() {
         spriteIndex++
-        if (spriteIndex === 6) { /// player
+        if (spriteIndex === 6) { // player
             spriteIndex = 0
         }
         spriteIndex1++
@@ -200,20 +201,27 @@
         c.clearRect(0, 0, centerX, centerY);
         c.drawImage(img, sx[spriteIndex], sy[spriteIndex], dx, 128, playerX, playerY, width, height)
 
-        if (shootCheck === 1) {
-            for (let i = 0; i < shoot.x.length; i++) {
-                //image, sx, sy, sw, sh, dx, dy, dw, dh
-                c.drawImage(img, SX[spriteIndex1], SY[spriteIndex1], 88, 34, shoot.x[i], shoot.y[i], 88, 34)
+        for (let i = 0; i < shoot.x.length; i++) {
+            //image, sx, sy, sw, sh, dx, dy, dw, dh
+            c.save();
+            c.translate(shoot.x[i] - 44, shoot.y[i] - 17); // you have to subtract half the hieght and half the width to get this centered
+            c.rotate(shoot.angle[i] + Math.PI);
+            c.drawImage(img, SX[spriteIndex1], SY[spriteIndex1], 88, 34, 0, 0, 88, 34) //use 0,0 for x and y at first and adjust it untill the rotation is at the center. 
+            c.restore();
 
-                shoot.x[i] = shoot.y[i] = pointerX + speedX
-                shoot.y[i] = shoot.y[i] = pointerY + speedY
-
-                //shoot.x[i] = shoot.x[i] + speedX;
-
-            }
+            shoot.x[i] = shoot.x[i] + shoot.vx[i];
+            shoot.y[i] = shoot.y[i] + shoot.vy[i];
         }
     }
-    
+
+    function SpawnArrow() {
+        let angle = Math.atan2(playerY - pointerY, playerX - pointerX)
+        shoot.angle.push(angle)
+        shoot.x.push(playerX + 150)
+        shoot.y.push(playerY + 55)
+        shoot.vx.push(-Math.cos(angle) * shootSpeed)
+        shoot.vy.push(-Math.sin(angle) * shootSpeed)
+    }
 
     function collsion() {
         // collsion code for player
@@ -268,8 +276,7 @@
         for (let i = 0; i < shoot.x.length; i++) {
             //delete when they go off the screen
             if (shoot.x[i] > canvas.width) { //is this [i] bullet off of the screen
-                shoot.x.splice(i, 1)
-                shoot.y.splice(i, 1) //you have to delete ALL of your bullet variables, not just x
+                deleteArrow(i)
             }
 
         }
@@ -284,8 +291,7 @@
                                 ey[i] = EnemyDamage.damageY
                                 ew[i] = EnemyDamage.damageWidth
                                 eh[i] = EnemyDamage.damageWidth
-                                shoot.x.splice(j, 1)
-                                shoot.y.splice(j, 1)
+                                deleteArrow(i)
                                 dead[i] = true;
                                 frameCount[i] = 0
                                 points = points + 1
@@ -325,28 +331,19 @@
     function keydown(e) {
         if (e.key === 'w') {
             wpres = true
-            playerY = playerY - 9
-            sx = playerOne.walkX
-            sy = playerOne.walkY
+
         }
         if (e.key === 'a') {
             apres = true
-            playerX = playerX - 9
-            sx = playerOne.walkRightX
-            sy = playerOne.walkRightY
 
         }
         if (e.key === 's') {
             spres = true
-            playerY = playerY + 9
-            sx = playerOne.walkX
-            sy = playerOne.walkY
+
         }
         if (e.key === 'd') {
             dpres = true
-            playerX = playerX + 9
-            sx = playerOne.walkX
-            sy = playerOne.walkY
+
         }
 
 
@@ -380,6 +377,7 @@
         mouseClick = true;
         sx = playerOne.attackX
         sy = playerOne.attackY
+        spriteIndex = 0
 
 
         width = 131;
@@ -398,33 +396,54 @@
     }
 
     function upgrades() {
-        // laser sight 
-        if (points === 2) {
-            c.strokeStyle = "red"
-            c.strokeWeight = "10"
-            c.beginPath()
-            c.moveTo(playerX + 50, playerY + 15)
-            c.lineTo(pointerX, pointerY)
-            c.stroke()
-            
-        }
+        // turrents
+        
     }
 
-    
+    function deleteArrow(index) {
+        shoot.x.splice(index, 1)
+        shoot.y.splice(index, 1) //you have to delete ALL of your bullet variables, not just x
+        shoot.vx.splice(index, 1)
+        shoot.vy.splice(index, 1) //you have to delete ALL of your bullet variables, not just x
+        shoot.angle.splice(index, 1)
+    }
+
     function animate() { // i used animate here to make it simplaer to have a constant fps you can change the name to draw and do a set interval for the same effect 
         collsion();
         playerCode();
         drawEnemy();
         upgrades();
 
-        console.log();
-        if (mouseClick === true) {
-            shoot.x.push(playerX)
-            shoot.y.push(playerY + 15)
-            shootCheck = 1
-            mouseClick = false;
+        if (wpres === true) {
+            playerY = playerY - 10
+            sx = playerOne.walkX
+            sy = playerOne.walkY
+        }
+        if (apres === true) {
+            playerX = playerX - 10
+            sx = playerOne.walkRightX
+            sy = playerOne.walkRightY
+        }
+        if (spres === true) {
+            playerY = playerY + 10
+            sx = playerOne.walkX
+            sy = playerOne.walkY
+        }
+        if (dpres === true) {
+            playerX = playerX + 10
+            sx = playerOne.walkX
+            sy = playerOne.walkY
+        }
+
+        if (mouseClick === true) { // 
+            if (spriteIndex === 4) {
+                SpawnArrow();
+                mouseClick = false;
+            }
 
         }
+        //SpawnArrow()
+
 
         if (enemyX.length <= 0) { // zombie spawn
             for (let i = 0; i < numberEnemy; i++) {
@@ -449,7 +468,7 @@
 
         requestAnimationFrame(animate)
     }
-    animate() 
+    animate()
 
 
 </script>

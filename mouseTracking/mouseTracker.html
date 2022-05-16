@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Movement</title>
+    <style>
+
+    </style>
+</head>
+
+<body>
+    <canvas id="canvas" width="500" height="500"></canvas>
+
+    <script>
+        var canvas = document.getElementById("canvas")
+        var ctx = canvas.getContext("2d")
+
+
+        var x = 200
+        var y = 200
+        var mousex = 0
+        var mousey = 0
+        var speedx = 0//10
+        var speedy = 0//5
+
+
+        document.addEventListener("mousemove", mousemove)
+        setInterval(update, 50)
+
+        function update() {
+            ctx.clearRect(0,0,1000,1000)
+            let angle = Math.atan2(y - mousey, x - mousex) //get the angle to face the mouse, you have to put y first and you have to use atan2. 
+            //you can use this to get the angle between any two things that you know the x and y for
+            ctx.font = '50pt arial'
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+            ctx.fillText("🗿",-25,25) //use 0,0 for x and y at first and adjust it untill the rotation is at the center. 
+            // normally you'll adjust it to be half height and width, but font is weird. 
+            ctx.restore();
+
+            x = x + speedx //i have speed turned off
+            y = y + speedy//try turning it on for some fun stuff
+
+            if(x < 0){      
+                speedx = -speedx          
+            }if(x > canvas.width){   
+                speedx = -speedx               
+            }if(y < 0){          
+                speedy = -speedy        
+            }if(y > canvas.height){  
+                speedy = -speedy                
+            }
+        }
+
+        function mousemove(e) {
+            mousex = e.offsetX
+            mousey = e.offsetY
+        }
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Movement</title>
+    <style>
+
+    </style>
+</head>
+
+<body>
+    <canvas id="canvas" width="1000" height="1000"></canvas>
+
+    <script>
+        var canvas = document.getElementById("canvas")
+        var ctx = canvas.getContext("2d")
+
+
+        var x = 200
+        var y = 200
+        var mousex = 0
+        var mousey = 0
+        var speedx = 5
+        var speedy = 3
+
+        var bulletx = []
+        var bullety = []
+
+        var bulletSpeedx = []
+        var bulletSpeedy = []
+
+        var bulletBaseSpeed = 20
+
+        var shootGun = false
+
+        document.addEventListener("mousemove", mousemove)
+        document.addEventListener("click", shoot)
+        setInterval(update, 50)
+
+        function update() {
+            ctx.clearRect(0, 0, 1000, 1000)
+            ctx.fillStyle = 'red'
+            ctx.beginPath()
+            ctx.arc(x, y, 10, 0, Math.PI * 2)
+            ctx.fill()
+            x = x + speedx //i have speed turned off
+            y = y + speedy//try turning it on for some fun stuff
+
+            if (x < 0) {
+                speedx = -speedx
+            } if (x > canvas.width) {
+                speedx = -speedx
+            } if (y < 0) {
+                speedy = -speedy
+            } if (y > canvas.height) {
+                speedy = -speedy
+            }
+
+
+            let angle = Math.atan2(y - mousey, x - mousex)
+            ctx.fillText(Math.cos(angle),mousex,mousey)
+
+            ///gun stuff
+            ctx.fillStyle = 'black'
+
+            for (let i = 0; i < bulletx.length; i++) {
+                ctx.beginPath()
+                ctx.arc(bulletx[i], bullety[i], 5, 0, Math.PI * 2) //draw bullet
+                ctx.fill()
+
+                bulletx[i] += bulletSpeedx[i] //move bullet
+                bullety[i] += bulletSpeedy[i]
+            }
+
+
+            if (shootGun) {
+                shootGun = false //this is a toggle so make sure you turn it off so you ohnly shoot one 
+
+                bulletTowardsMouseSpawn()
+                // beamTowardsMouse()
+            }
+        }
+
+        function mousemove(e) {
+            mousex = e.offsetX
+            mousey = e.offsetY
+        }
+
+        function shoot() {
+            shootGun = true
+        }
+
+        function bulletTowardsMouseSpawn() {
+            let angle = Math.atan2(y - mousey, x - mousex)
+            bulletx.push(x)//spawn the bullet at the mouse
+            bullety.push(y)
+            bulletSpeedx.push(-Math.cos(angle) * bulletBaseSpeed)
+            bulletSpeedy.push(-Math.sin(angle) * bulletBaseSpeed)
+            //you use cos for x, and sin for y. these will give you the slope of the line you want
+            //think back to geometry class when you did rise over run and stuff like that
+            //anyway cos gives you a number between 0-1, so to change it you'll do like you do with Math.random()
+            //in this case I want the number to be between 0 and the bullet speed, so I multiply it
+        }
+
+
+        function beamTowardsMouse() {
+            //easy way to do it
+            ctx.beginPath()
+            ctx.moveTo(mousex, mousey)
+            ctx.lineTo(x, y)
+            ctx.stroke()
+        }
+
+    </script>
+</body>
+
+</html>
